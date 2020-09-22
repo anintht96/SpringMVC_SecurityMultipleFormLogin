@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+	<security:http pattern="/admin/**" auto-config="true" use-expressions="true">
+		<security:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"/>
+		
+		<security:access-denied-handler error-page="/403"/>
+		
+		<security:form-login login-page="/login1" login-processing-url="/admin/j_spring_security_login" default-target-url="/admin/admin" username-parameter="username" password-parameter="password" authentication-failure-url="/login1?message=error"/>
+		<security:logout logout-url="/admin/j_spring_security_logout" logout-success-url="/login1?message=logout" delete-cookies="JSESSIONID" invalidate-session="true"/>
+	</security:http>
+	
+	<security:http auto-config="true" use-expressions="true">
+		<security:intercept-url pattern="/user**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')"/>
+		
+		<security:access-denied-handler error-page="/403"/>
+			
+		<security:form-login login-page="/login2" login-processing-url="/j_spring_security_login" default-target-url="/user" authentication-failure-url="/login2?message=error" username-parameter="username" password-parameter="password"/>
+		<security:logout logout-url="/j_spring_security_logout" logout-success-url="/login2?message=logout" delete-cookies="JSESSIONID" invalidate-session="true"/>
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:user-service>
+				<security:user name="admin" password="{noop}123456" authorities="ROLE_ADMIN"/>
+				<security:user name="user" password="{noop}123456" authorities="ROLE_USER"/>
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>
